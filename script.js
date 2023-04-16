@@ -65,6 +65,7 @@ function displaySingleMessage(res){
     const container = document.querySelector('.chat-container');
     const message = document.createElement('div');
     message.classList.add('message');
+    message.setAttribute('data-test', 'message');
     message.innerHTML = "";
     message.innerHTML += `
         <span class="time"> ${res.time} </span>
