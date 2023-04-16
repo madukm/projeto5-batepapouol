@@ -1,5 +1,7 @@
 let userName;
 
+const chatContainer = document.querySelector('.chat-container');
+    
 
 axios.defaults.headers.common['Authorization'] = 'BgNaMGjpbxSXb08gFSR5X5hg';
 
@@ -30,6 +32,7 @@ function login() {
         updateChat();
     })
     .catch(error =>{
+        console.log(error.response);
         alert('Usuário já logado. Tente novamente');
         window.location.reload();
     })
@@ -49,9 +52,7 @@ function checkConnection(){
 
 
 function clearChat(){
-    const container = document.querySelector('.chat-container');
-    
-    container.innerHTML = "";
+    chatContainer.innerHTML = "";
 }
 
 function updateChat(){
@@ -66,12 +67,12 @@ function displayMessages(res){
     for(let i=0; i<100; i++){
         displaySingleMessage(res.data[i]);
     }
-    window.scrollTo(0, document.body.scrollHeight);
+    const scrollingElement = (document.scrollingElement || document.body);
+    scrollingElement.scrollTop = scrollingElement.scrollHeight;
 }
 
 
 function displaySingleMessage(res){
-    const container = document.querySelector('.chat-container');
     const message = document.createElement('div');
     message.classList.add('message');
     message.setAttribute('data-test', 'message');
@@ -86,10 +87,10 @@ function displaySingleMessage(res){
     if(res.type === "status"){
         message.classList.add('status');
     }
-    container.appendChild(message);
+    chatContainer.appendChild(message);
 }
 
-async function sendMessageText(){
+async function sendMessage(){
     const res = await axios.post('https://mock-api.driven.com.br/api/vm/uol/messages',
     {
         from: userName,
@@ -102,6 +103,7 @@ async function sendMessageText(){
         updateChat();
     })
     .catch(error => {
+        console.log(error.response);
         window.location.reload();
     })
 }
