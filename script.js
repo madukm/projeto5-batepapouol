@@ -7,59 +7,68 @@ login();
 
 const connectionInterval = setInterval(checkConnection, 5000);
 
+const updateChatInterval = setInterval(updateChat, 3000);
 
-async function login() {
-    try {
-        userName = String(prompt('Qual seu nome?'));    
-        const res = await axios.post('https://mock-api.driven.com.br/api/vm/uol/participants',
-        {
-            name: userName
-        });
-        let data = res.data;
+const userInput = document.getElementById("input-message");
+
+userInput.addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      document.getElementById("btn").click();
+    }
+});
+
+function login() {
+    userName = String(prompt('Qual seu nome?'));    
+    const res = axios.post('https://mock-api.driven.com.br/api/vm/uol/participants',
+    {
+        name: userName
+    })
+    .then(data => {
+        console.log(data);
         alert("Você está conectado!");
         updateChat();
-        return true;
-    } catch (error) {
-        console.log(error);
-        if(error.response.status === 400){
-            alert('Usuário já logado. Tente novamente');
-            window.location.reload();
-            console.log("Usuário já logado.");
-        }
-        return false;
-    }
+    })
+    .catch(error =>{
+        alert('Usuário já logado. Tente novamente');
+        window.location.reload();
+    })
 }
 
 
-async function checkConnection(){
-    try{
-        const res = await axios.post('https://mock-api.driven.com.br/api/vm/uol/status',
-        {
-            name: userName
-        });
-        console.log("still connected");
-        let data = res.data;;
-        updateChat();
-        return data;
-    } catch(error){
+function checkConnection(){
+    const res = axios.post('https://mock-api.driven.com.br/api/vm/uol/status',
+    {
+        name: userName
+    })
+    .catch(error =>{
         alert("Você foi desconectado");
         window.location.reload();
-        return error.response;
-    }
+    })
+}
+
+
+function clearChat(){
+    const container = document.querySelector('.chat-container');
+    
+    container.innerHTML = "";
 }
 
 function updateChat(){
-    const promise = axios.get('https://mock-api.driven.com.br/api/vm/uol/messages');
-    promise.then(displayMessages);
+    const res = axios.get('https://mock-api.driven.com.br/api/vm/uol/messages')
+    .then(data => {
+        clearChat();
+        displayMessages(data);
+    })
 }
 
 function displayMessages(res){
-    res = res.data;
     for(let i=0; i<100; i++){
-        displaySingleMessage(res[i]);
+        displaySingleMessage(res.data[i]);
     }
     window.scrollTo(0, document.body.scrollHeight);
 }
+
 
 function displaySingleMessage(res){
     const container = document.querySelector('.chat-container');
@@ -80,23 +89,19 @@ function displaySingleMessage(res){
     container.appendChild(message);
 }
 
-async function getMessageText(){
-    const userInput = document.getElementById("messageText");
-    
-    try {
-        const res = await axios.post('https://mock-api.driven.com.br/api/vm/uol/messages',
-        {
-            from: userName,
-            to: "Todos",
-            text: userInput.value,
-            type: "message"
-        });
-        let data = res.data;
+async function sendMessageText(){
+    const res = await axios.post('https://mock-api.driven.com.br/api/vm/uol/messages',
+    {
+        from: userName,
+        to: "Todos",
+        text: userInput.value,
+        type: "message"
+    })
+    .then(data =>{
         userInput.value = "";
         updateChat();
-        return data;
-    } catch (error) {
-        console.log(error);
-        return error.response;
-    }
+    })
+    .catch(error => {
+        window.location.reload();
+    })
 }
