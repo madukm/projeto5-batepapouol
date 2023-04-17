@@ -90,7 +90,7 @@ function displaySingleMessage(res){
     chatContainer.appendChild(message);
 }
 
-async function sendMessage(){
+function sendMessage(){
     const res = axios.post('https://mock-api.driven.com.br/api/vm/uol/messages',
     {
         from: userName,
