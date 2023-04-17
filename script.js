@@ -91,7 +91,7 @@ function displaySingleMessage(res){
 }
 
 async function sendMessage(){
-    const res = await axios.post('https://mock-api.driven.com.br/api/vm/uol/messages',
+    const res = axios.post('https://mock-api.driven.com.br/api/vm/uol/messages',
     {
         from: userName,
         to: "Todos",
@@ -105,5 +105,5 @@ async function sendMessage(){
     .catch(error => {
         console.log(error.response);
         window.location.reload();
-    })
+    });
 }
